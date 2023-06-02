@@ -13,7 +13,7 @@
 <h2>Saisons :</h2>
 			{% for season in program.seasons %}
 				<h3>
-					<a href="{{ path("program_season_show", { programId: program.id, seasonId: season.id }) }}">
+					<a href="{{ path("program_season_show", { program: program.id, season: season.id }) }}">
                     Saison {{ season.number }}</a>
 				</h3>
 			{% endfor %}
