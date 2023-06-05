@@ -9,13 +9,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 
 #[Route('/episode')]
 class EpisodeController extends AbstractController
 {
     #[Route('/', name: 'app_episode_index', methods: ['GET'])]
-    public function index(EpisodeRepository $episodeRepository): Response
+    public function index(RequestStack $requestStack, EpisodeRepository $episodeRepository): Response
     {
+    $session = $requestStack->getSession();
+    if (!$session->has('total')) {
+        $session->set('total', 0); // if total doesn’t exist in session, it is initialized.
+    }
+    $total = $session->get('total'); // get actual value in session with ‘total' key.
+
         return $this->render('episode/index.html.twig', [
             'episodes' => $episodeRepository->findAll(),
         ]);
@@ -30,6 +38,7 @@ class EpisodeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $episodeRepository->save($episode, true);
+            $this->addFlash('success', 'Le nouvel épisode a bien été ajouté');
 
             return $this->redirectToRoute('app_episode_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -56,6 +65,8 @@ class EpisodeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $episodeRepository->save($episode, true);
+            $this->addFlash('success', 'Le nouvel épisode a bien été modifié');
+
 
             return $this->redirectToRoute('app_episode_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -71,6 +82,8 @@ class EpisodeController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$episode->getId(), $request->request->get('_token'))) {
             $episodeRepository->remove($episode, true);
+            $this->addFlash('danger', 'L\'épisode a bien été supprimé');
+
         }
 
         return $this->redirectToRoute('app_episode_index', [], Response::HTTP_SEE_OTHER);

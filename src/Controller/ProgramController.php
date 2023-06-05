@@ -12,10 +12,7 @@ use App\Entity\Season;
 use App\Entity\Episode;
 use App\Form\ProgramType;
 use Symfony\Component\HttpFoundation\Request;
-
-
-
-
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 
 #[Route('/program/', name: 'program_')]
@@ -40,6 +37,7 @@ class ProgramController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $programRepository->save($program, true);            
+            $this->addFlash('success', 'La nouvelle série a bien été ajoutée');
 
             // Redirect to categories list
             return $this->redirectToRoute('program_index');
